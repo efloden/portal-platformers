@@ -71,6 +71,10 @@ class PlayState extends Phaser.State {
         let pressingDown = this.cursors.down.isDown
             || game.input.keyboard.isDown(Phaser.Keyboard.S)
 
+        // Throw fedora on R key press
+        var rKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
+        rKey.onDown.add(this.throwFedora, this);
+
         if (pressingUp && !airborne) {
             this.player.body.velocity.y = -700;
             if (!this.sounds.jump.isPlaying) {
@@ -84,7 +88,7 @@ class PlayState extends Phaser.State {
             this.player.body.thrustLeft(moveAmt);
             this.player.animations.play('crouchwalk');
             this.crouchFace(this.player);
-
+            this.player.data.direction = 'left';
         }
         else if (pressingDown && pressingRight) {
             moveAmt /= 4;
@@ -92,7 +96,7 @@ class PlayState extends Phaser.State {
             this.player.body.thrustRight(moveAmt);
             this.player.animations.play('crouchwalk');
             this.crouchFace(this.player);
-
+            this.player.data.direction = 'right';
         }
         else if (pressingDown) {
             this.player.animations.play('crouch');
@@ -108,7 +112,7 @@ class PlayState extends Phaser.State {
             this.player.animations.play('walk');
             this.player.data.walking = true;
             this.forwardFace(this.player);
-
+            this.player.data.direction = 'left';
         }
         else if (pressingRight) {
             this.player.scale.x = 2;
@@ -120,7 +124,7 @@ class PlayState extends Phaser.State {
             this.player.animations.play('walk');
             this.player.data.walking = true;
             this.forwardFace(this.player);
-
+            this.player.data.direction = 'right';
         }
         else if (!pressingDown && Math.abs(this.player.body.velocity.x) < 2.00){
             this.player.animations.play('idle');
@@ -158,6 +162,14 @@ class PlayState extends Phaser.State {
         if (this.player.y + this.player.height / 2 >= this.game.world.height) {
           this.killPlayer();
         }
+    }
+
+    throwFedora() {
+        const fedoraSprite = (player.data.direction === 'right') ?
+          game.add.sprite(player.x, player.y, 'fedora') :
+          game.add.sprite(player.x - 0.5, player.y, 'fedora');
+        fedoraSprite.scale.set(0.1, 0.1);
+        this.game.physics.p2.enable(fedoraSprite);
     }
 
     forwardFace(player) {
